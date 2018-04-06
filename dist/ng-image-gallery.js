@@ -1,4 +1,4 @@
- (function(){
+(function(){
 	'use strict';
 
 	// Key codes
@@ -196,6 +196,8 @@
 
 				onOpen 			: 	'&?',		// function
 				onClose 		: 	'&?',		// function,
+				beforeDoNext 	: 	'&?',		// function,
+				afterDoNext 	: 	'&?',		// function,
 				onDelete        :   '&?',
 				onEdit          :   '&?'
 			},
@@ -438,6 +440,8 @@
 					scope.onClose 	 = 	(scope.onClose 	!= undefined) ? scope.onClose 	 : 	angular.noop;
 					scope.onDelete 	 = 	(scope.onDelete != undefined) ? scope.onDelete 	 : 	angular.noop;
 					scope.onEdit = (scope.onEdit != undefined) ? scope.onEdit : angular.noop;
+					scope.beforeDoNext = (scope.beforeDoNext != undefined) ? scope.beforeDoNext : angular.noop;
+					scope.afterDoNext = (scope.afterDoNext != undefined) ? scope.afterDoNext : angular.noop;
 
 					// If images populate dynamically, reset gallery
 					var imagesFirstWatch = true;
@@ -511,12 +515,17 @@
 
 					// Change image to next
 					scope.methods.next = function(){
+						//say controller that the image will be changed
+						scope.beforeDoNext();
 						if(scope._activeImageIndex == (scope.images.length - 1)){
 							scope._activeImageIndex = 0;
 						}
 						else{
 							scope._activeImageIndex = scope._activeImageIndex + 1;
 						}
+						$timeout(function(){
+							scope.afterDoNext();
+						}, 300);
 					}
 
 					// Change image to prev
