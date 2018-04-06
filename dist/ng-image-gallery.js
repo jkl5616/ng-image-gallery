@@ -196,8 +196,10 @@
 
 				onOpen 			: 	'&?',		// function
 				onClose 		: 	'&?',		// function,
-				beforeDoNext 	: 	'&?',		// function,
-				afterDoNext 	: 	'&?',		// function,
+				beforeOpen 		: 	'&?',		// function
+				beforeClose 	: 	'&?',		// function,
+				afterOpen 		: 	'&?',		// function
+				afterClose 	    : 	'&?',		    // function,
 				onDelete        :   '&?',
 				onEdit          :   '&?'
 			},
@@ -318,7 +320,6 @@
 
 					// Image load complete promise
 					scope._loadImg = function(imgObj){
-
 						// Return rejected promise
 						// if not image object received
 						if(!imgObj) return $q.reject();
@@ -439,9 +440,11 @@
 					scope.onOpen 	 = 	(scope.onOpen 	!= undefined) ? scope.onOpen 	 : 	angular.noop;
 					scope.onClose 	 = 	(scope.onClose 	!= undefined) ? scope.onClose 	 : 	angular.noop;
 					scope.onDelete 	 = 	(scope.onDelete != undefined) ? scope.onDelete 	 : 	angular.noop;
-					scope.onEdit = (scope.onEdit != undefined) ? scope.onEdit : angular.noop;
-					scope.beforeDoNext = (scope.beforeDoNext != undefined) ? scope.beforeDoNext : angular.noop;
-					scope.afterDoNext = (scope.afterDoNext != undefined) ? scope.afterDoNext : angular.noop;
+					scope.onEdit     =  (scope.onEdit != undefined) ? scope.onEdit : angular.noop;
+					scope.beforeOpen =  (scope.beforeOpen != undefined) ? scope.beforeOpen : angular.noop;
+					scope.afterOpen  =  (scope.afterOpen != undefined) ? scope.afterOpen : angular.noop;
+					scope.beforeClose = (scope.beforeClose != undefined) ? scope.beforeClose : angular.noop;
+					scope.afterClose =  (scope.afterClose != undefined) ? scope.afterClose : angular.noop;
 
 					// If images populate dynamically, reset gallery
 					var imagesFirstWatch = true;
@@ -485,6 +488,8 @@
 
 					// Open gallery modal
 					scope.methods.open = function(imgIndex){
+						scope.beforeOpen();
+						console.log(scope.beforeOpen);
 						// Open modal from an index if one passed
 						scope._activeImageIndex = (imgIndex) ? imgIndex : 0;
 
@@ -497,10 +502,12 @@
 						$timeout(function(){
 							scope.onOpen();
 						}, 300);
+						scope.afterOpen();
 					}
 
 					// Close gallery modal
 					scope.methods.close = function(){
+						scope.beforeClose();
 						scope.opened = false; // Model closed
 
 						// set overflow hidden to body
@@ -511,21 +518,18 @@
 							scope.onClose();
 							scope._activeImageIndex = 0; // Reset index
 						}, 300);
+						scope.afterClose();
 					}
 
 					// Change image to next
 					scope.methods.next = function(){
 						//say controller that the image will be changed
-						scope.beforeDoNext();
 						if(scope._activeImageIndex == (scope.images.length - 1)){
 							scope._activeImageIndex = 0;
 						}
 						else{
 							scope._activeImageIndex = scope._activeImageIndex + 1;
 						}
-						$timeout(function(){
-							scope.afterDoNext();
-						}, 300);
 					}
 
 					// Change image to prev
